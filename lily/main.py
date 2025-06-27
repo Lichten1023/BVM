@@ -24,6 +24,10 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
             binary = "0011"
             binary += str(format(arg1, f"0{4}b"))   # レジスタ(代入先)を追加
             binary += str(format(arg2, f"0{4}b"))   # レジスタ(代入元)を追加
+        if opcode == "MUL":   # MUL
+            binary = "0100"
+            binary += str(format(arg1, f"0{4}b"))   # レジスタ(代入先)を追加
+            binary += str(format(arg2, f"0{4}b"))   # レジスタ(代入元)を追加
         
         if len(binary) != 16:   # 命令長を調節
             binary = binary.ljust(16, "0")
@@ -56,6 +60,11 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
             ra = int(binary[4:8], 2)
             rb = int(binary[8:12], 2)
             self.sub(ra, rb)
+            return
+        if instruction == "0100":   # MUL
+            ra = int(binary[4:8], 2)
+            rb = int(binary[8:12], 2)
+            self.mul(ra, rb)
             return
 
         else:   # 不正な命令で停止
@@ -98,10 +107,20 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
             print(f"R{r1} : {self.registers[r1]}")
         pass
 
+    def mul(self, r1, r2):
+        if self.verbose:
+            print("Called MUL.")
+            print(f"R{r1} : {self.registers[r1]}, R{r2} : {self.registers[r2]}")
+        self.registers[r1] *= self.registers[r2]
+
+        if self.verbose:
+            print(f"R{r1} : {self.registers[r1]}")
+        pass
+
     def ldi(self, r, imm):
         self.registers[r] = int(imm)
 
-program = [("LDI", 1, 8), ("LDI", 2, 8), ("ADD", 1, 2), ("SUB", 1, 2), ("HALT",)]
+program = [("LDI", 1, 8), ("LDI", 2, 8), ("ADD", 1, 2), ("SUB", 1, 2), ("MUL", 1, 2), ("HALT",)]
 
 VM = vm(verbose=True)  # VMのインスタンスを生成。verbose=Trueで詳細モードを有効化。
 

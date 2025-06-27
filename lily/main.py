@@ -20,7 +20,11 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
             binary = "0010"
             binary += str(format(arg1, f"0{4}b"))   # レジスタ(代入先)を追加
             binary += str(format(arg2, f"0{8}b"))   # 即値を追加
-
+        if opcode == "SUB":   # SUB
+            binary = "0011"
+            binary += str(format(arg1, f"0{4}b"))   # レジスタ(代入先)を追加
+            binary += str(format(arg2, f"0{4}b"))   # レジスタ(代入元)を追加
+        
         if len(binary) != 16:   # 命令長を調節
             binary = binary.ljust(16, "0")
 
@@ -47,6 +51,11 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
             r = int(binary[4:8], 2)
             imm = int(binary[8:16], 2)
             self.ldi(r, imm)
+            return
+        if instruction == "0011":   # SUB
+            ra = int(binary[4:8], 2)
+            rb = int(binary[8:12], 2)
+            self.sub(ra, rb)
             return
 
         else:   # 不正な命令で停止
@@ -79,12 +88,22 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
             print(f"R{r1} : {self.registers[r1]}")
         pass
 
+    def sub(self, r1, r2):
+        if self.verbose:
+            print("Called SUB.")
+            print(f"R{r1} : {self.registers[r1]}, R{r2} : {self.registers[r2]}")
+        self.registers[r1] -= self.registers[r2]
+
+        if self.verbose:
+            print(f"R{r1} : {self.registers[r1]}")
+        pass
+
     def ldi(self, r, imm):
         self.registers[r] = int(imm)
 
-program = [("LDI", 1, 8), ("LDI", 2, 8), ("ADD", 1, 2), ("HALT",)]
+program = [("LDI", 1, 8), ("LDI", 2, 8), ("ADD", 1, 2), ("SUB", 1, 2), ("HALT",)]
 
-VM = vm(verbose=False)
+VM = vm(verbose=True)  # VMのインスタンスを生成。verbose=Trueで詳細モードを有効化。
 
 for i in range(len(program)):
     VM.RunAssembly(*program[i])
@@ -94,4 +113,5 @@ for i in range(len(program)):
 # - HALT ; 0000 ; 引数なし ; ステータスコードを表示する。対応表は別記。;
 # - ADD ; 0001 ; レジスタ番号4bit, レジスタ番号4bit ; 前者のレジスタに後者の値を足し合わせ、前者の値を変化させる.;
 # - LDI ; 0010 ; 代入先レジスタ4bit, 即値8bit ; レジスタを即値に設定する。レジスタの持つ値は上書きされる.;
+# - SUB ; 0011 ; レジスタ番号4bit, レジスタ番号4bit ; 前者のレジスタから後者の値を引き算し、前者の値を変化させる.;
 # ###

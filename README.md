@@ -1,12 +1,12 @@
-# BVM General README
+# BVM General README (Japanese)
 
-This repository contains a minimal example of a very small virtual machine
-(``VM``) implementation along with a demo program and unit tests.
+BVMはシンプルな仮想マシン (VM) の最小実装と、デモプログラム、ユニットテ
+ストを収めたリポジトリです。
 
-## Running the demo
+## デモの実行
 
-The ``hello.asm`` demo program prints ``Hello World`` using the VM. You can run
-it with ``run_file`` from the ``8001.vm`` module:
+``hello.asm`` デモプログラムは VM を使って ``Hello World`` を表示します。
+``8001.vm`` モジュールの ``run_file`` を利用して実行できます。
 
 ```bash
 python - <<'EOF'
@@ -17,9 +17,10 @@ print('Output:', ''.join(vm.run_file(program).output))
 EOF
 ```
 
-## Running the tests
+## テストの実行
 
-Use ``python -m pytest`` so that the project root is added to ``sys.path``:
+プロジェクトルートを ``sys.path`` に追加するため、 ``python -m pytest`` を
+使用してください。
 
 ```bash
 python -m pytest -q

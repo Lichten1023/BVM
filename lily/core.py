@@ -89,43 +89,41 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
 
     def add(self, r1, r2):
         if self.verbose:
-            print("Called ADD.")
-            print(f"R{r1} : {self.registers[r1]}, R{r2} : {self.registers[r2]}")
+            print(f"Called ADD.\nR{r1} : {self.registers[r1]}, R{r2} : {self.registers[r2]}")
         self.registers[r1] += self.registers[r2]
 
         if self.verbose:
-            print(f"R{r1} : {self.registers[r1]}")
+            print(f"R{r1} : {self.registers[r1]}\n")
         pass
 
     def sub(self, r1, r2):
         if self.verbose:
-            print("Called SUB.")
-            print(f"R{r1} : {self.registers[r1]}, R{r2} : {self.registers[r2]}")
+            print(f"Called SUB.\nR{r1} : {self.registers[r1]}, R{r2} : {self.registers[r2]}")
         self.registers[r1] -= self.registers[r2]
 
         if self.verbose:
-            print(f"R{r1} : {self.registers[r1]}")
+            print(f"R{r1} : {self.registers[r1]}\n")
         pass
 
     def mul(self, r1, r2):
         if self.verbose:
-            print("Called MUL.")
-            print(f"R{r1} : {self.registers[r1]}, R{r2} : {self.registers[r2]}")
+            print(f"Called MUL.\nR{r1} : {self.registers[r1]}, R{r2} : {self.registers[r2]}")
         self.registers[r1] *= self.registers[r2]
 
         if self.verbose:
-            print(f"R{r1} : {self.registers[r1]}")
+            print(f"R{r1} : {self.registers[r1]}\n")
         pass
 
     def ldi(self, r, imm):
         self.registers[r] = int(imm)
+        if self.verbose:
+            print(f"Called LDI. R{r} set to {imm}.\nR{r} : {self.registers[r]}\n")
 
-program = [("LDI", 1, 8), ("LDI", 2, 8), ("ADD", 1, 2), ("SUB", 1, 2), ("MUL", 1, 2), ("HALT",)]
-
-VM = vm(verbose=True)  # VMのインスタンスを生成。verbose=Trueで詳細モードを有効化。
-
-for i in range(len(program)):
-    VM.RunAssembly(*program[i])
+if __name__ == "__main__":
+    program = [("LDI", 1, 8), ("LDI", 2, 8), ("ADD", 1, 2), ("SUB", 1, 2), ("MUL", 1, 2), ("HALT",)]
+    VM = vm(verbose=True)  # VMのインスタンスを生成。verbose=Trueで詳細モードを有効化。
+    for i in range(len(program)):
+        VM.RunAssembly(*program[i])
 
 ###
 # - オペコード ; バイナリ ; 引数情報 ; 備考 ;

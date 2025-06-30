@@ -17,11 +17,15 @@ print('Output:', ''.join(vm.run_file(program).output))
 EOF
 ```
 
-## テストの実行
+## サンプルプログラム
 
-プロジェクトルートを ``sys.path`` に追加するため、 ``python -m pytest`` を
-使用してください。
-
-```bash
-python -m pytest -q
 ```
+VERBOSE
+
+LDI R1 2
+LDI R2 3
+ADD R1 R2
+SUB R1 R2
+HALT
+```
+簡単な足し算と引き算を実行するプログラムです。

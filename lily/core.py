@@ -10,24 +10,71 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         if self.verbose:
             print(f"Opcode : {opcode}")
 
-        if opcode == "HALT":    # HALT
-            binary = "0000"
-        if opcode == "ADD":   # ADD
+        if opcode == "HALT":
+            binary = "0000" + "0" * 12  # 引数なし、残りは0で埋める
+
+        elif opcode == "ADD":
             binary = "0001"
-            binary += str(format(arg1, f"0{4}b"))   # レジスタ(代入先)を追加
-            binary += str(format(arg2, f"0{4}b"))   # レジスタ(代入元)を追加
-        if opcode == "LDI":   # LDI
+            binary += format(arg1, "04b")
+            binary += format(arg2, "04b")
+            binary += "0" * 4  # 残り4bitパディング
+
+        elif opcode == "LDI":
             binary = "0010"
-            binary += str(format(arg1, f"0{4}b"))   # レジスタ(代入先)を追加
-            binary += str(format(arg2, f"0{8}b"))   # 即値を追加
-        if opcode == "SUB":   # SUB
+            binary += format(arg1, "04b")
+            binary += format(arg2, "08b")
+
+        elif opcode == "SUB":
             binary = "0011"
-            binary += str(format(arg1, f"0{4}b"))   # レジスタ(代入先)を追加
-            binary += str(format(arg2, f"0{4}b"))   # レジスタ(代入元)を追加
-        if opcode == "MUL":   # MUL
+            binary += format(arg1, "04b")
+            binary += format(arg2, "04b")
+            binary += "0" * 4
+
+        elif opcode == "MUL":
             binary = "0100"
-            binary += str(format(arg1, f"0{4}b"))   # レジスタ(代入先)を追加
-            binary += str(format(arg2, f"0{4}b"))   # レジスタ(代入元)を追加
+            binary += format(arg1, "04b")
+            binary += format(arg2, "04b")
+            binary += "0" * 4
+
+        elif opcode == "CMP":
+            binary = "0101"
+            binary += format(arg1, "04b")
+            binary += format(arg2, "04b")
+            binary += "0" * 4
+
+        elif opcode == "JE":
+            binary = "0110" + "0000"  # unused bits
+            binary += format(arg1, "08b")
+
+        elif opcode == "JNE":
+            binary = "0111" + "0000"
+            binary += format(arg1, "08b")
+
+        elif opcode == "JG":
+            binary = "1000" + "0000"
+            binary += format(arg1, "08b")
+
+        elif opcode == "JL":
+            binary = "1001" + "0000"
+            binary += format(arg1, "08b")
+
+        elif opcode == "JMP":
+            binary = "1010" + "0000"
+            binary += format(arg1, "08b")
+
+        elif opcode == "MOV":
+            binary = "1011"
+            binary += format(arg1, "04b")
+            binary += format(arg2, "04b")
+            binary += "0" * 4
+
+        elif opcode == "NOP":
+            binary = "1100" + "0" * 12
+
+        elif opcode == "PRINT":
+            binary = "1101"
+            binary += format(arg1, "04b")
+            binary += "0" * 8  # 残りは0で埋める
         
         if len(binary) != 16:   # 命令長を調節
             binary = binary.ljust(16, "0")
@@ -44,29 +91,79 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         instruction = binary[0:4]   # 命令を抽出
 
         if instruction == "0000":   # HALT
-            self.halt(0) # "正常終了"
+            self.halt(0)  # "正常終了"
             return
+
         if instruction == "0001":   # ADD
             ra = int(binary[4:8], 2)
             rb = int(binary[8:12], 2)
             self.add(ra, rb)
             return
+
         if instruction == "0010":   # LDI
             r = int(binary[4:8], 2)
             imm = int(binary[8:16], 2)
             self.ldi(r, imm)
             return
+
         if instruction == "0011":   # SUB
             ra = int(binary[4:8], 2)
             rb = int(binary[8:12], 2)
             self.sub(ra, rb)
             return
+
         if instruction == "0100":   # MUL
             ra = int(binary[4:8], 2)
             rb = int(binary[8:12], 2)
             self.mul(ra, rb)
             return
 
+        if instruction == "0101":   # CMP
+            ra = int(binary[4:8], 2)
+            rb = int(binary[8:12], 2)
+            self.cmp(ra, rb)
+            return
+
+        if instruction == "0110":   # JE
+            imm = int(binary[8:16], 2)
+            self.je(imm)
+            return
+
+        if instruction == "0111":   # JNE
+            imm = int(binary[8:16], 2)
+            self.jne(imm)
+            return
+
+        if instruction == "1000":   # JG
+            imm = int(binary[8:16], 2)
+            self.jg(imm)
+            return
+
+        if instruction == "1001":   # JL
+            imm = int(binary[8:16], 2)
+            self.jl(imm)
+            return
+
+        if instruction == "1010":   # JMP
+            imm = int(binary[8:16], 2)
+            self.jmp(imm)
+            return
+
+        if instruction == "1011":   # MOV
+            ra = int(binary[4:8], 2)
+            rb = int(binary[8:12], 2)
+            self.mov(ra, rb)
+            return
+
+        if instruction == "1100":   # NOP
+            self.nop()
+            return
+
+        if instruction == "1101":   # PRINT
+            r = int(binary[4:8], 2)
+            self.print_reg(r)
+            return
+    
         else:   # 不正な命令で停止
             self.halt(1) # "不正な命令"
             return

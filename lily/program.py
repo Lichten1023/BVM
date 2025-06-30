@@ -54,13 +54,22 @@ def ProcessAssembly(Program:list, Verbose:bool=False) -> None:
             ProcessedProgram.append(int(Program[i][2][1]))
         elif Program[i][0] == "HALT":   # HALT命令を処理
             ProcessedProgram.append(Program[i][0],)
+        elif Program[i][0] == "JMP":  # JMP命令を処理
+            ProcessedProgram.append(Program[i][0])
+            ProcessedProgram.append(int(Program[i][1]))
         Program[i] = tuple(ProcessedProgram)
 
     print(Program)  # 処理済みプログラムを表示
 
+    PC = 0  # プログラムカウンタを初期化
     VM = vm(verbose=Verbose)  # VMのインスタンスを生成して実行
-    for i in range(len(Program)):
-        VM.RunAssembly(*Program[i])
+
+    while PC < len(Program):  # プログラムカウンタがプログラムの長さより小さい間ループ
+        if Program[PC][0] == "JMP":
+            PC = Program[PC][1] - 1  # JMP命令の処理
+        else:
+            VM.RunAssembly(*Program[PC])
+            PC += 1 # プログラムカウンタをインクリメント
     pass
 
 program = """

@@ -2,6 +2,7 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
     def __init__(self, verbose=False):
         self.memory = [0] * 0x10000  # メインメモリ（64KB）
         self.registers = [0] * 8     # 汎用レジスタ R0〜R7（8本）
+        self.Flags = 0
         self.verbose = verbose       # 実行中の状態を表示する詳細モードの有効/無効（True/False）
         print(f"Initialized. | Verbose : {self.verbose}")
 
@@ -79,7 +80,9 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         if len(binary) != 16:   # 命令長を調節
             binary = binary.ljust(16, "0")
 
-        self.RunBinary(binary)
+        r = None
+        r = self.RunBinary(binary)
+        return r
 
     def RunBinary(self, binary):  #16bitバイナリを入力
         if self.verbose:
@@ -126,8 +129,7 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
 
         if instruction == "0110":   # JE
             imm = int(binary[8:16], 2)
-            self.je(imm)
-            return
+            return self.je(imm)
 
         if instruction == "0111":   # JNE
             imm = int(binary[8:16], 2)
@@ -217,11 +219,22 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         pass
 
     def cmp(self, r1, r2):
-        pass  # 2つのレジスタの値を比較し、FLAGSを設定
+        if self.registers[r1] == self.registers[r2]:
+            self.Flags = 0
+        elif self.registers[r1] < self.registers[r2]:
+            self.Flags = 1
+        elif self.registers[r1] > self.registers[r2]:
+            self.Flags = 2
+        if self.verbose:
+            d = {0:"=", 1:"<", 2:">"}
+            print(f"R{r1} {d[self.Flags]} R{r2}, so FLAGS became {self.Flags}\n")
 
-    def je(self, addr):
-        pass  # FLAGSがEqualのとき、指定番地にジャンプ
-
+    def je(self, addr): # FLAGSがEqual(0)のとき、指定番地にジャンプ
+        if self.Flags == 0:
+            return True
+        else:
+            return False
+        
     def jne(self, addr):
         pass  # FLAGSがNot Equalのとき、指定番地にジャンプ
 
@@ -232,7 +245,7 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         pass  # FLAGSがLessのとき、指定番地にジャンプ
 
     def jmp(self, addr):
-        pass  # 無条件で指定番地にジャンプ
+        pass  # 無条件で指定番地にジャンプ program.pyで処理
 
     def mov(self, r_dest, r_src):
         pass  # r_dest ← r_src の値をコピー
@@ -259,7 +272,7 @@ if __name__ == "__main__":
 # - LDI ; 0010 ; 代入先レジスタ4bit, 即値8bit ; レジスタを即値に設定する。レジスタの持つ値は上書きされる。;
 # - SUB ; 0011 ; レジスタ番号4bit, レジスタ番号4bit ; 前者のレジスタから後者の値を引き算し、前者の値を変化させる。;
 # - MUL ; 0100 ; レジスタ番号4bit, レジスタ番号4bit ; 前者のレジスタに後者の値を掛け算し、前者の値を変化させる。;
-# - CMP ; 0101 ; レジスタ番号4bit, レジスタ番号4bit ; 2つのレジスタの値を比較し、FLAGSを設定する（等号・大小など）。;
+# - CMP ; 0101 ; レジスタ番号4bit, レジスタ番号4bit ; 2つのレジスタの値を比較し、FLAGSを設定する（=のとき0, <のとき1, >のとき2）。;
 # - JE  ; 0110 ; 即値8bit ; CMPで等しい場合に指定番地へジャンプする。;
 # - JNE ; 0111 ; 即値8bit ; CMPで等しくない場合に指定番地へジャンプする。;
 # - JG  ; 1000 ; 即値8bit ; CMPで左が右より大きい場合に指定番地へジャンプする。;

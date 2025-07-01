@@ -183,7 +183,7 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         return f"Exitcode : {ExitCode} \nStatus : {ErrorDict[ExitCode]}"
 
     def halt(self, ExitCode=-1): # HALT : 停止命令
-        print(f"\nCalled HALT. \n{self.GetExitStatus(ExitCode)}\n")
+        print(f"Called HALT. \n{self.GetExitStatus(ExitCode)}\n")
         quit()
 
     def add(self, r1, r2):
@@ -256,7 +256,7 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
     
 
     def print_reg(self, r):
-        print(f"R{r} : {self.registers[r]}")
+        print(f"R{r} : {self.registers[r]}\n")
 
     
 if __name__ == "__main__":

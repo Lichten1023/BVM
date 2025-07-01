@@ -4,7 +4,7 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         self.registers = [0] * 8     # 汎用レジスタ R0〜R7（8本）
         self.Flags = 0
         self.verbose = verbose       # 実行中の状態を表示する詳細モードの有効/無効（True/False）
-        print(f"Initialized. | Verbose : {self.verbose}")
+        print(f"Initialized. | Verbose : {self.verbose}\n")
 
     def RunAssembly(self, index, opcode, arg1=None, arg2=None, arg3=None):
         binary = ""
@@ -183,7 +183,7 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         return f"Exitcode : {ExitCode} \nStatus : {ErrorDict[ExitCode]}"
 
     def halt(self, ExitCode=-1): # HALT : 停止命令
-        print(f"Called HALT. \n\n{self.GetExitStatus(ExitCode)}\n")
+        print(f"\nCalled HALT. \n{self.GetExitStatus(ExitCode)}\n")
         quit()
 
     def add(self, r1, r2):
@@ -255,8 +255,8 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
             print(f"Called NOP.\n")
     
 
-    def print(self, r):
-        pass  # 指定レジスタの値を表示
+    def print_reg(self, r):
+        print(f"R{r} : {self.registers[r]}")
 
     
 if __name__ == "__main__":

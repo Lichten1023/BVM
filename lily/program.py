@@ -1,6 +1,7 @@
 from core import vm
 
 def Run(Program:str) -> list:
+    Program = Program.upper()
     Program = PreprocessAssembly(Program)
     Program = AnalyzeAssemblyMetadata(Program)
     ProcessAssembly(Program, Verbose=Verbose)
@@ -69,13 +70,17 @@ def ProcessAssembly(Program:list, Verbose:bool=False) -> None:
             ProcessedProgram.append(Program[i][1])
             ProcessedProgram.append(int(Program[i][2][1]))
             ProcessedProgram.append(int(Program[i][3][1]))
+        elif Program[i][1] == "PRINT":  # PRINT命令を処理
+            ProcessedProgram.append(Program[i][1])
+            ProcessedProgram.append(int(Program[i][2][1]))
         else:
             print("Invalid program detected")
 
         Program[i] = tuple(ProcessedProgram)
     
-    print(Program)  # 処理済みプログラムを表示
-    print(LineIndexList)  # 行番号リストを表示
+    if Verbose:
+        print(Program)  # 処理済みプログラムを表示
+        print(LineIndexList)  # 行番号リストを表示
 
     PC = 0  # プログラムカウンタを初期化
     VM = vm(verbose=Verbose)  # VMのインスタンスを生成して実行
@@ -101,23 +106,26 @@ def ProcessAssembly(Program:list, Verbose:bool=False) -> None:
     pass
 
 program = """
-VERBOSE
-// This is a comment
+// verbose
 
-10 LDI R1 3      // R1 にループ回数3をセット（カウンタ）
-20 LDI R2 1      // R2 に定数1（減算用）をセット
-30 LDI R3 0
+20 ldi r1 2
+30 ldi r2 2
+40 ldi r3 8  // 乗数を決定
+50 ldi r4 0
+51 ldi r5 1
 
-// ループ開始
-40 CMP R1 R3     // R1 == 0 かを比較
-41 JE 90         // もしゼロなら終了
+52 sub r3 r5
+60 cmp r3 r4
+61 je 90
+70 mul r1 r2
+80 sub r3 r5
+81 jmp 60
 
-// ここに繰り返したい処理を書く（例：NOP 的な処理）
-60 SUB R1 R2     // カウンタを1減らす
-70 JMP 40        // 再び条件判定へ
-
-// ループ終了
-90 HALT
+90 print r1
+91 halt
 """
 
-Run(program)
+with open("lily\lily.asm", "r", encoding="utf-8") as f:
+    content = f.read()
+
+Run(content)

@@ -133,8 +133,7 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
 
         if instruction == "0111":   # JNE
             imm = int(binary[8:16], 2)
-            self.jne(imm)
-            return
+            return self.jne(imm)
 
         if instruction == "1000":   # JG
             imm = int(binary[8:16], 2)
@@ -219,11 +218,11 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         pass
 
     def cmp(self, r1, r2):
-        if self.registers[r1] == self.registers[r2]:
+        if self.registers[r1] == self.registers[r2]:    # 0 : Equal
             self.Flags = 0
-        elif self.registers[r1] < self.registers[r2]:
+        elif self.registers[r1] < self.registers[r2]:   # 1 : Less
             self.Flags = 1
-        elif self.registers[r1] > self.registers[r2]:
+        elif self.registers[r1] > self.registers[r2]:   # 2 : Greater
             self.Flags = 2
         if self.verbose:
             d = {0:"=", 1:"<", 2:">"}
@@ -235,20 +234,32 @@ class vm:   # １行プログラムの実行器として動作。PC等のステ�
         else:
             return False
         
-    def jne(self, addr):
-        pass  # FLAGSがNot Equalのとき、指定番地にジャンプ
+    def jne(self, addr): # FLAGSがNot Equal(0以外)のとき、指定番地にジャンプ
+        if self.Flags != 0:
+            return True
+        else:
+            return False
 
-    def jg(self, addr):
-        pass  # FLAGSがGreaterのとき、指定番地にジャンプ
+    def jg(self, addr): # FLAGSがLess(1)のとき、指定番地にジャンプ
+        if self.Flags == 1:
+            return True
+        else:
+            return False
 
-    def jl(self, addr):
-        pass  # FLAGSがLessのとき、指定番地にジャンプ
+    def jl(self, addr): # FLAGSがGreater(2)のとき、指定番地にジャンプ
+        if self.Flags == 1:
+            return True
+        else:
+            return False
 
     def jmp(self, addr):
         pass  # 無条件で指定番地にジャンプ program.pyで処理
 
     def mov(self, r_dest, r_src):
-        pass  # r_dest ← r_src の値をコピー
+        self.registers[r_dest] = self.registers[r_src]
+        if self.verbose:
+            print(f"Called MOV.\nR{r_dest} : {self.registers[r_dest]}, R{r_src} : {self.registers[r_src]}")
+            print(f"R{r_dest} is now set to {self.registers[r_dest]}\n")
 
     def nop(self):
         if self.verbose:

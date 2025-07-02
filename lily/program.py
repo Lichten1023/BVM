@@ -5,6 +5,7 @@ def Run(Program:str) -> list:
     Program = PreprocessAssembly(Program)
     Program = AnalyzeAssemblyMetadata(Program)
     ProcessAssembly(Program, Verbose=Verbose)
+    print(Program)
 
 def PreprocessAssembly(Program):
     Program = Program.split("\n")   # プログラムをリスト化
@@ -52,7 +53,7 @@ def ProcessAssembly(Program:list, Verbose:bool=False) -> None:
             ProcessedProgram.append(Program[i][1])
             ProcessedProgram.append(int(Program[i][2][1]))
             ProcessedProgram.append(int(Program[i][3]))
-        elif Program[i][1] == "ADD" or Program[i][1] == "SUB" or Program[i][1] == "MUL":    # ADD命令を処理
+        elif Program[i][1] == "ADD" or Program[i][1] == "SUB" or Program[i][1] == "MUL":    # 算術命令を処理
             ProcessedProgram.append(Program[i][1])
             ProcessedProgram.append(int(Program[i][2][1]))
             ProcessedProgram.append(int(Program[i][3][1]))
@@ -64,6 +65,15 @@ def ProcessAssembly(Program:list, Verbose:bool=False) -> None:
         elif Program[i][1] == "JE":  # JE命令を処理
             ProcessedProgram.append(Program[i][1])
             ProcessedProgram.append(int(Program[i][2]))
+        elif Program[i][1] == "JG":  # JG命令を処理
+            ProcessedProgram.append(Program[i][1])
+            ProcessedProgram.append(int(Program[i][2]))
+        elif Program[i][1] == "JL":  # JL命令を処理
+            ProcessedProgram.append(Program[i][1])
+            ProcessedProgram.append(int(Program[i][2]))
+        elif Program[i][1] == "JNE":  # JNE命令を処理
+            ProcessedProgram.append(Program[i][1])
+            ProcessedProgram.append(int(Program[i][2]))
         elif Program[i][1] == "NOP":   # NOP命令を処理
             ProcessedProgram.append(Program[i][1])
         elif Program[i][1] == "CMP":    # CMP命令を処理
@@ -73,6 +83,10 @@ def ProcessAssembly(Program:list, Verbose:bool=False) -> None:
         elif Program[i][1] == "PRINT":  # PRINT命令を処理
             ProcessedProgram.append(Program[i][1])
             ProcessedProgram.append(int(Program[i][2][1]))
+        elif Program[i][1] == "MOV":    # MOV命令を処理
+            ProcessedProgram.append(Program[i][1])
+            ProcessedProgram.append(int(Program[i][2][1]))
+            ProcessedProgram.append(int(Program[i][3][1]))
         else:
             print("Invalid program detected")
 
@@ -90,14 +104,32 @@ def ProcessAssembly(Program:list, Verbose:bool=False) -> None:
             PC = LineIndexList.index(int(Program[PC][1]))  # JMP命令の処理
             if Verbose:
                 print(f"Jumping to instruction at address {LineIndexList[PC]}.\n")
-        if Program[PC][0] == "JE":  # FLAGSがEqual(0)のとき、指定番地にジャンプ
-            if VM.RunAssembly(LineIndexList[PC], *Program[PC]):
+        elif Program[PC][0] == "JE":  # FLAGSが0(Equal)のとき、指定番地にジャンプ
+            if VM.RunAssembly(LineIndexList[PC], *Program[PC]) == True:
                 PC = LineIndexList.index(int(Program[PC][1]))
                 if Verbose:
                     print(f"Jumping to instruction at address {LineIndexList[PC]}.\n")
             else:
                 if Verbose:
-                    print("FLAGS was not Equal (0), so the jump was not taken.")
+                    print("FLAGS was not Equal (0), so the jump was not taken.\n")
+                PC += 1
+        elif Program[PC][0] == "JG":  # FLAGSが1(Less)のとき、指定番地にジャンプ
+            if VM.RunAssembly(LineIndexList[PC], *Program[PC]) == True:
+                PC = LineIndexList.index(int(Program[PC][1]))
+                if Verbose:
+                    print(f"Jumping to instruction at address {LineIndexList[PC]}.\n")
+            else:
+                if Verbose:
+                    print("FLAGS was not Less (1), so the jump was not taken.\n")
+                PC += 1
+        elif Program[PC][0] == "JNE":  # FLAGSが0(Equal)以外のとき、指定番地にジャンプ
+            if VM.RunAssembly(LineIndexList[PC], *Program[PC]) == True:
+                PC = LineIndexList.index(int(Program[PC][1]))
+                if Verbose:
+                    print(f"Jumping to instruction at address {LineIndexList[PC]}.\n")
+            else:
+                if Verbose:
+                    print("FLAGS was Equal (0), so the jump was not taken.\n")
                 PC += 1
 
         else:
@@ -105,27 +137,8 @@ def ProcessAssembly(Program:list, Verbose:bool=False) -> None:
             PC += 1 # プログラムカウンタをインクリメント
     pass
 
-program = """
-// verbose
+if __name__ == "__main__":
+    with open("lily\\lily.asm", "r", encoding="utf-8") as f:
+        content = f.read()
 
-20 ldi r1 2
-30 ldi r2 2
-40 ldi r3 8  // 乗数を決定
-50 ldi r4 0
-51 ldi r5 1
-
-52 sub r3 r5
-60 cmp r3 r4
-61 je 90
-70 mul r1 r2
-80 sub r3 r5
-81 jmp 60
-
-90 print r1
-91 halt
-"""
-
-with open("lily\lily.asm", "r", encoding="utf-8") as f:
-    content = f.read()
-
-Run(content)
+    Run(content)

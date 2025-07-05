@@ -1,4 +1,4 @@
-// VERBOSE
+VERBOSE
 
 10  LDI R1 1       // R1 ← 1（結果の初期値）
 20  LDI R2 2       // R2 ← 2（累乗の底: 固定値）

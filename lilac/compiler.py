@@ -4,6 +4,26 @@ class compiler:
         self.BinProgram = None
         self.Version = "lilac alpha"
 
+        self.compiledict = {
+            "NOP"   : (0x00, 0),
+            "BRK"   : (0x01, 0),
+            "JMP"   : (0x02, 4),
+            "JSR"   : (0x03, 4),
+            "RTS"   : (0x04, 0),
+            "JZ"    : (0x05, 4),
+            "JNZ"   : (0x06, 4),
+            "JC"    : (0x07, 4),
+            "JN"    : (0x08, 4),
+            "MOV"   : (0x10, 1),
+            "LOADimm"   : (0x12, 2),
+            "LOADmem"   : (0x12, 3),
+            "STORE" : (0x13, 3),
+            "LDIX"  : (0x14, 1),
+            "STIX"  : (0x15, 1),
+            "JC"    : (0x00, 1),
+            "JC"    : (0x00, 4),
+        }
+
     def CompileASMFile(self, FilePath):
         try:
             with open(FilePath, "r", encoding="utf-8") as f:
